@@ -1,0 +1,31 @@
+:root {
+  --primary-color: #2d9adf;
+  --secondary-color: #c6e6f9;
+}
+
+body {
+  width: 350px;
+  height: 700px;
+  padding: 10px;
+  background-color: var(--secondary-color);
+}
+
+#selectedText {
+  font-size: 14px;
+  height: 140px;
+  width: 320px;
+  color: var(--secondary-color);
+  background-color: var(--primary-color);
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.success {
+  font-size: 10px;
+  color: white;
+  background-color: var(--primary-color);
+  padding: 7px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
