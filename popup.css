@@ -1,31 +1,123 @@
 :root {
-  --primary-color: #2d9adf;
-  --secondary-color: #c6e6f9;
+  --primary-color: #2aa8e7;
+  --secondary-color: #b2e2fd;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+ul::-webkit-scrollbar {
+  display: none;
 }
 
 body {
-  width: 350px;
-  height: 700px;
+  overflow-y: hidden;
+  width: 330px;
+  height: 600px;
   padding: 10px;
   background-color: var(--secondary-color);
 }
 
-#selectedText {
-  font-size: 14px;
-  height: 140px;
-  width: 320px;
-  color: var(--secondary-color);
-  background-color: var(--primary-color);
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+h1 {
+  font-size: 17px;
+  font-weight: 300;
+  color: rgb(50, 50, 50);
+  padding: 7px;
+  margin: 0;
 }
 
-.success {
-  font-size: 10px;
+#selectedTextsList {
+  width: 300px;  
+  height: 200px; 
+  overflow: auto;
+  list-style: none;
+  display: block;
+  padding: 5px;
+  border-radius: 5px;
+  margin: 8px 0;
+  font-size: 13px;
+  background-color: #88d3ff;
+}
+
+/* #selectedTextsList {
+  border-radius: 5px;
+} */
+
+#selectedTextsList li {
+  padding: 8px; 
+  margin: 8px;
+  background-color: #9dd8fa;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#selectedTextsList li:hover {
+  background-color: #4bbdff;
+}
+
+#selectedTextsList li.selected {
+  font-weight: bold; 
+  background-color: #4bbdff;
+}
+
+#selectedTextsList li:first-child {
+  font-weight: bold; 
+}
+
+#selectedTextsList li:last-child {
+  border-bottom: none; 
+}
+
+/* prompt  */
+#displayText, .do-something {
+  font-size: 12px;
+  font-weight: 300;
   color: white;
   background-color: var(--primary-color);
-  padding: 7px;
+  padding: 9px;
   border: 1px solid #ccc;
-  border-radius: 4px;
 }
+
+input {
+  font-size: 12px;
+  font-weight: 300;
+  padding: 9px;
+  border: none;
+}
+
+input:focus {
+  outline: none;
+}
+
+#promptExamples {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 4px;
+  margin: 10px 0;
+  padding: 5px;
+  background-color: #88d3ff;
+  border-radius: 5px;
+}
+
+#promptExamples li {
+  padding: 8px; 
+  margin: 8px;
+  background-color: #9dd8fa;
+  cursor: pointer;
+  list-style: none;
+}
+
+#answer {
+  font-size: 14px;
+  font-weight: 400;
+  color: white;
+  background-color: var(--primary-color);
+  padding: 9px;
+  border: 1px solid #ccc;
+  margin: 10px;
+  border-radius: 5px;
+}
+

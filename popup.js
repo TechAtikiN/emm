@@ -1,93 +1,134 @@
+let userSelectedTexts = [];
+let finalSelectedText = ''
+let promptBeginning = ''
+
 document.addEventListener('DOMContentLoaded', function () {
 
-  // set up the button click handler
-  let captureButton = document.getElementById('captureButton');
-  let selectedTextDiv = document.getElementById('selectedText');
+  // remove the item from local storage
+  // chrome.storage.local.remove('userSelectedTexts', function () {
+  //   console.log('Item removed from local storage.');
+  // });
 
-  // initialize the selected text
-  updateUserSelectedText('No text selected');
+  // get the stored array
+  chrome.storage.local.get(['userSelectedTexts'], function (result) {
+    userSelectedTexts = result.userSelectedTexts;
+  });
 
-  captureButton.addEventListener('click', function () {
+  // get the active tab
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    let tab = tabs[0];
 
-    // get the active tab
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      let tab = tabs[0];
+    // execute the script on the active tab
+    chrome.scripting.executeScript(
+      {
+        target: { tabId: tab.id },
+        function: captureSelectedText,
+      },
+      function (result) {
+        let selectedText = result[0].result;
+        let formatSelectedText = selectedText?.substring(0, 250) + '...' + selectedText.split(' ').pop();
 
-      // execute the script on the active tab
-      chrome.scripting.executeScript(
-        {
-          target: { tabId: tab.id },
-          function: captureSelectedText,
-        },
-        // handle the results of the script execution
-        function (result) {
-          let selectedText = result[0].result;
-          let formatSelectedText = selectedText.substring(0, 250) + '...' + selectedText.split(' ').pop();
+        userSelectedTexts.push(selectedText);
+        userSelectedTexts = userSelectedTexts.filter(item => item != '')
+        userSelectedTexts = userSelectedTexts.reverse()
 
-          formatSelectedText ? captureButton.innerText = 'View Text' : captureButton.innerText = 'Capturing...';
-          updateUserSelectedText(formatSelectedText);
-
-          // store the selected text to local storage
-          let storeButton = document.createElement('button')
-          storeButton.innerText = 'Store Text';
-          document.body.appendChild(storeButton);
-
-          storeButton.addEventListener('click', function () {
-            chrome.storage.local.set({ 'selectedText': selectedText }, function () {
-            });
-          });
-
-          // get the stored text from local storage
-          chrome.storage.local.get(['selectedText'], function (result) {
-            let storedVariable = result.selectedText;
-          });
-
-          // Perform task
-          let optionButton = document.createElement('button')
-          optionButton.innerText = 'Perform Operation';
-          document.body.appendChild(optionButton);
-
-          // template for prompt
-          let promptBeginning = ''
-
-          let promptInitial = document.createElement('input')
-          promptInitial.setAttribute('type', 'text')
-          promptInitial.setAttribute('id', 'promptInitial')
-          promptInitial.setAttribute('placeholder', 'What do you want to do with the selected text?')
-          document.body.appendChild(promptInitial)
-
-          promptInitial.addEventListener('change', function () {
-            promptBeginning = promptInitial.value
-          })
-
-          const promptList = ['Give summary of the text', 'Give related words', 'Spanish version of', 'Easily explain the text']
-
-          const promptExamples = document.createElement('ul')
-
-          promptExamples.setAttribute('id', 'promptExamples')
-          for (i = 0; i < promptList.length; i++) {
-            const promptExample = document.createElement('li')
-            promptExample.innerText = promptList[i]
-            promptExamples.appendChild(promptExample)
-          }
-          document.body.appendChild(promptExamples)
-
-          // fetch data from openai
-          optionButton.addEventListener('click', fetchData(selectedText, promptBeginning))
+        let selectedTextsList = document.getElementById('selectedTextsList');
+        for (i = 0; i < userSelectedTexts.length; i++) {
+          const text = document.createElement('li')
+          text.innerText = userSelectedTexts[i]
+          selectedTextsList.appendChild(text)
         }
 
-      );
-    });
+        const handleClick = (e) => {
+          let target = e.target
+          if (target.tagName === 'LI') {
+            handleOnClickLi(target)
+          }
+        }
+
+        const handleOnClickLi = (selectedLi) => {
+          const previouslySelectedLi = document.querySelector('li.selected');
+          if (previouslySelectedLi) {
+            previouslySelectedLi.classList.remove('selected');
+          }
+
+          selectedLi.classList.add('selected')
+          finalSelectedText = selectedLi.textContent
+          console.log('finalSelectedText', finalSelectedText)
+          return finalSelectedText
+        }
+
+        var liElements = document.querySelectorAll("li");
+        let liArray = []
+        for (var i = 0; i < liElements.length; i++) {
+          liArray.push(liElements[i].textContent)
+        }
+
+        selectedTextsList.addEventListener("click", handleClick);
+
+
+        console.log('finalSelectedText', finalSelectedText)
+
+        // store the array in local storage
+        chrome.storage.local.set({ 'userSelectedTexts': userSelectedTexts }, function () {
+          console.log('Text is stored in local storage', userSelectedTexts);
+        });
+
+        // Perform task
+        let optionButton = document.createElement('button')
+        optionButton.innerText = 'Do Something!';
+        optionButton.classList.add('do-something')
+        document.body.appendChild(optionButton);
+
+        // template for prompt
+
+        // handle prompt
+        promptBeginning = handlePrompt(promptBeginning)
+
+        // fetch data from openai
+        optionButton.addEventListener('click', fetchData)
+
+        //answer from openai
+        let answer = document.createElement('div')
+        answer.setAttribute('id', 'answer')
+        document.body.appendChild(answer)
+      }
+    );
   });
-  // update the selected text
-  function updateUserSelectedText(text) {
-    selectedTextDiv.innerHTML = text;
+
+  // handle prompt
+  const handlePrompt = (promptBeginning) => {
+    let promptInitial = document.createElement('input')
+    promptInitial.setAttribute('type', 'text')
+    promptInitial.setAttribute('id', 'promptInitial')
+    document.body.appendChild(promptInitial)
+    promptInitial.setAttribute('placeholder', 'Something like??')
+
+    promptInitial.addEventListener('change', function () {
+      promptBeginning = promptInitial.value
+    })
+
+    const promptList = ['Give summary of the text', 'Give related words of', 'Explain in detail', 'Easily explain the text']
+
+    const promptExamples = document.createElement('ul')
+    promptExamples.setAttribute('id', 'promptExamples')
+
+    for (i = 0; i < promptList.length; i++) {
+      const promptExample = document.createElement('li')
+      promptExample.innerText = promptList[i]
+      promptExamples.appendChild(promptExample)
+    }
+
+    document.body.appendChild(promptExamples)
+
+    return promptBeginning
   }
 });
 
 // fetch data from openai
-const fetchData = async (promptBeginning, selectedText) => {
+const fetchData = async () => {
 
+  console.log(`${promptBeginning} ${finalSelectedText}`)
   const response = await fetch('https://api.openai.com/v1/engines/text-davinci-003/completions', {
     method: 'POST',
     headers: {
@@ -95,7 +136,7 @@ const fetchData = async (promptBeginning, selectedText) => {
       'Authorization': 'Bearer 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'
     },
     body: JSON.stringify({
-      prompt: `${promptBeginning} ${selectedText}`,
+      prompt: `${promptBeginning} ${finalSelectedText}`,
       temperature: 0.9,
       max_tokens: 2048,
       frequency_penalty: 0.5,
@@ -107,12 +148,14 @@ const fetchData = async (promptBeginning, selectedText) => {
     const data = await response.json()
     const answer = data.choices[0].text
     console.log(answer)
+    document.getElementById('answer').innerText = answer
   }
   else {
     console.log(response)
   }
 }
 
-function captureSelectedText() { // returns the selected text
+// capture the selected text
+const captureSelectedText = () => { // returns the selected text
   return window.getSelection().toString();
 }
