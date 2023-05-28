@@ -3,7 +3,6 @@ let finalSelectedText = ''
 let promptBeginning = ''
 
 document.addEventListener('DOMContentLoaded', function () {
-
   // remove the item from local storage
   // chrome.storage.local.remove('userSelectedTexts', function () {
   //   console.log('Item removed from local storage.');
@@ -26,17 +25,20 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       function (result) {
         let selectedText = result[0].result;
-        let formatSelectedText = selectedText?.substring(0, 250) + '...' + selectedText.split(' ').pop();
-
-        userSelectedTexts.push(selectedText);
-        userSelectedTexts = userSelectedTexts.filter(item => item != '')
-        userSelectedTexts = userSelectedTexts.reverse()
+        // let formatSelectedText = selectedText?.substring(0, 250) + '...' + selectedText.split(' ').pop();
+        if (userSelectedTexts) {
+          userSelectedTexts.includes(selectedText) ? alert('Select already exists') : selectedText && userSelectedTexts.push(selectedText);
+          userSelectedTexts = userSelectedTexts.filter(item => item != '')
+          userSelectedTexts = userSelectedTexts.reverse()
+        }
 
         let selectedTextsList = document.getElementById('selectedTextsList');
-        for (i = 0; i < userSelectedTexts.length; i++) {
-          const text = document.createElement('li')
-          text.innerText = userSelectedTexts[i]
-          selectedTextsList.appendChild(text)
+        if (userSelectedTexts) {
+          for (i = 0; i < userSelectedTexts.length; i++) {
+            const text = document.createElement('li')
+            text.innerText = userSelectedTexts[i]
+            selectedTextsList.appendChild(text)
+          }
         }
 
         const handleClick = (e) => {
@@ -58,34 +60,29 @@ document.addEventListener('DOMContentLoaded', function () {
           return finalSelectedText
         }
 
-        var liElements = document.querySelectorAll("li");
+        let liElements = document.querySelectorAll('li');
         let liArray = []
-        for (var i = 0; i < liElements.length; i++) {
+        for (let i = 0; i < liElements.length; i++) {
           liArray.push(liElements[i].textContent)
         }
 
-        selectedTextsList.addEventListener("click", handleClick);
-
-
-        console.log('finalSelectedText', finalSelectedText)
+        selectedTextsList.addEventListener('click', handleClick);
 
         // store the array in local storage
         chrome.storage.local.set({ 'userSelectedTexts': userSelectedTexts }, function () {
           console.log('Text is stored in local storage', userSelectedTexts);
         });
 
-        // Perform task
+        // Perform task 
         let optionButton = document.createElement('button')
         optionButton.innerText = 'Do Something!';
         optionButton.classList.add('do-something')
         document.body.appendChild(optionButton);
 
-        // template for prompt
-
         // handle prompt
         promptBeginning = handlePrompt(promptBeginning)
 
-        // fetch data from openai
+        // Do something button
         optionButton.addEventListener('click', fetchData)
 
         //answer from openai
@@ -128,15 +125,14 @@ document.addEventListener('DOMContentLoaded', function () {
 // fetch data from openai
 const fetchData = async () => {
 
-  console.log(`${promptBeginning} ${finalSelectedText}`)
   const response = await fetch('https://api.openai.com/v1/engines/text-davinci-003/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer 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'
+      'Authorization': 'Bearer <API_KEY>'
     },
     body: JSON.stringify({
-      prompt: `${promptBeginning} ${finalSelectedText}`,
+      prompt: `${promptBeginning} ${finalSelectedText}. Give descriptive answers`,
       temperature: 0.9,
       max_tokens: 2048,
       frequency_penalty: 0.5,
@@ -147,7 +143,6 @@ const fetchData = async () => {
   if (response.ok) {
     const data = await response.json()
     const answer = data.choices[0].text
-    console.log(answer)
     document.getElementById('answer').innerText = answer
   }
   else {
