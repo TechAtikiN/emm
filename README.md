@@ -25,29 +25,29 @@
 
 <details>
 <summary>Clone the Repository</summary>
-1. Clone the EMM! repository from GitHub to your local machine.
-2. Open the `popup.js` file and replace `<API_KEY>` with your OpenAI API Key.
+1. Clone the EMM! repository from GitHub to your local machine.<br>
+2. Open the `popup.js` file and replace `API_KEY` with your OpenAI API Key.
 </details>
 
 <details>
 <summary> Open Chrome Extensions</summary>
-  - In the top-right corner of the Chrome Extensions page, toggle the Developer mode switch to enable it. 
-  - Click on the "Load unpacked" button and   Navigate to the cloned EMM! repository folder on your local machine, select it and load the extension.
+1. In the top-right corner of the Chrome Extensions page, toggle the Developer mode switch to enable it. <br>
+2. Click on the "Load unpacked" button and   Navigate to the cloned EMM! repository folder on your local machine, select it and load the extension.
 </details>
 
 <details>
 <summary> Verify in the browser</summary>
- - EMM appears in the list of installed  extensions on the Chrome Extensions page. Enable it.
- - Click on the extension icon to capture selected text, customize prompts, and fetch relevant information.
+1. EMM appears in the list of installed  extensions on the Chrome Extensions page. Enable it.<br>
+2. Click on the extension icon to capture selected text, customize prompts, and fetch relevant information.
 </details>
 
 <details>
 <summary> Explore EMM!</summary>
-  1. Capture selected text by selecting it on the webpage.
-  2. The captured text will be stored locally and displayed in a scrollable list on the extension's popup.
-  3. Select a text from the list to customize prompts for fetching information.
-  4. Use the provided input field to modify the prompt.
-  5. Click the "Do Something!" button to fetch data using OpenAI's API.
-  6. The response from the API will be displayed below.
-  7. Repeat
+1. Capture selected text by selecting it on the webpage.<br>
+2. The captured text will be stored locally and displayed in a scrollable list on the extension's popup.<br>
+3. Select a text from the list to customize prompts for fetching information.<br>
+4. Use the provided input field to modify the prompt.<br>
+5. Click the "Do Something!" button to fetch data using OpenAI's API.<br>
+6. The response from the API will be displayed below.<br>
+7. Repeat
 </details>
